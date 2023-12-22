@@ -9,8 +9,8 @@ from torchvision import transforms
 
 def preprocess_image(image):
     # Auto-orient the image
-    image = transforms.functional.autocontrast(image, cutoff=0)
-    image = transforms.functional.auto_pil(image)
+    image = transforms.functional.autocontrast(image)
+
     
     # Resize the image to 640x640
     transform = transforms.Compose([
@@ -69,16 +69,23 @@ def page_scanner():
         results = perform_object_detection(image)
 
         # Check if the results are available
-        if results is not None:
-            # Tampilkan hasil deteksi
-            for result in results.names[0]:
-                st.write(f"Detected: {result} with confidence {result.confidence.item():.2f}")
+        if results is not None and len(results) > 0:
+            # Ambil hasil deteksi untuk objek pertama dalam batch
+            detected_class = results[0, 0]  # Ganti indeks sesuai dengan kebutuhan Anda
+
+            # Akses nama dan confidence
+            class_name = detected_class['name']
+            confidence = detected_class['confidence']
+
+            # Tampilkan informasi
+            st.write(f"Detected: {class_name} with confidence {confidence:.2f}")
 
             # Pemrosesan gambar (contoh: konversi ke array NumPy)
             image_array = np.array(image)
             st.write("Image Shape:", image_array.shape)
         
     st.write("Berikut adalah hasil dari skrinning sel kanker rahim")
+
 
 
 # Fungsi untuk membuat halaman
