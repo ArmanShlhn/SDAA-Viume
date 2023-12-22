@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 git lfs track "/model/best.pt"
+/model/best.pt filter=lfs diff=lfs merge=lfs -text
