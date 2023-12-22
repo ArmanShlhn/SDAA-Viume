@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 /model/*.pt filter=lfs diff=lfs merge=lfs -text
+git lfs track "/model/*.pt"
