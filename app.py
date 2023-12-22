@@ -12,7 +12,7 @@ def perform_object_detection(image):
     image.save(image_path)
 
     # Load model YOLOv5 yang telah Anda latih
-    model_path = "/model/best.pt"  # Sesuaikan dengan lokasi Anda
+    model_path = "model/best.pt"  # Sesuaikan dengan lokasi Anda
 
     # Check if the model file exists
     if not os.path.isfile(model_path):
