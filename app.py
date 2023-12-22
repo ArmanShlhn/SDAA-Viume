@@ -5,7 +5,23 @@ import streamlit as st
 import torch
 import os  # Import the os module for path manipulation
 from yolov5.models.yolo import Model
+from torchvision import transforms
 
+def preprocess_image(image):
+    # Auto-orient the image
+    image = transforms.functional.autocontrast(image, cutoff=0)
+    image = transforms.functional.auto_pil(image)
+    
+    # Resize the image to 640x640
+    transform = transforms.Compose([
+        transforms.Resize((640, 640)),
+        transforms.ToTensor(),
+    ])
+    
+    img_tensor = transform(image).float()
+    img_tensor /= 255.0  # Normalization
+    
+    return img_tensor.unsqueeze(0)  # Add batch dimension
 
 # Fungsi untuk melakukan deteksi objek menggunakan YOLOv5
 def perform_object_detection(image):
@@ -25,9 +41,7 @@ def perform_object_detection(image):
     model.eval()
 
     # Load image for object detection
-    img_tensor = model.preprocess(image)
-    img_tensor = img_tensor.float()  # YOLOv5 memerlukan tipe data float
-    img_tensor /= 255.0  # Normalisasi
+    img_tensor = preprocess_image(image)
 
     # Lakukan inferensi
     with torch.no_grad():
@@ -35,6 +49,7 @@ def perform_object_detection(image):
 
     # Kembalikan hasil deteksi
     return results
+
 
 # Fungsi halaman Scanner yang diperbarui
 def page_scanner():
