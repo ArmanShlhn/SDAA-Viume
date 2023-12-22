@@ -4,6 +4,8 @@ import numpy as np
 import streamlit as st
 import torch
 import os  # Import the os module for path manipulation
+from yolov5.models.yolo import Model
+
 
 # Fungsi untuk melakukan deteksi objek menggunakan YOLOv5
 def perform_object_detection(image):
