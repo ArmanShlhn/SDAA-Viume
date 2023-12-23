@@ -4,13 +4,46 @@ import numpy as np
 import streamlit as st
 import torch
 import os  # Import the os module for path manipulation
-from yolov5.models.yolo import Model
 from torchvision import transforms
+
+import streamlit as st
+from PIL import Image, ImageDraw
+import torch
+import io
+import json
+
+# Load YOLOv5 model
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/Kuliah/model/SDAA/model/best.pt')
+
+def predict_image(file):
+    image_bytes = file.read()
+    img = Image.open(io.BytesIO(image_bytes))
+
+    # Perform prediction
+    pred_img = model(img)
+
+    # Render predicted image with bounding boxes
+    img_with_boxes = img.copy()
+    draw = ImageDraw.Draw(img_with_boxes)
+
+    for det in pred_img.xyxy[0]:
+        # Format of det: [x_min, y_min, x_max, y_max, confidence, class]
+        x_min, y_min, x_max, y_max, _, class_id = map(int, det)
+
+        # Draw bounding box
+        draw.rectangle([x_min, y_min, x_max, y_max], outline="red", width=2)
+
+        # Optionally, you can display class labels
+        label = f"Class: {class_id}"
+        draw.text((x_min, y_min - 10), label, fill="red")
+
+    return img_with_boxes
+
+
 
 def preprocess_image(image):
     # Auto-orient the image
     image = transforms.functional.autocontrast(image)
-
     
     # Resize the image to 640x640
     transform = transforms.Compose([
@@ -19,7 +52,7 @@ def preprocess_image(image):
     ])
     
     img_tensor = transform(image).float()
-    img_tensor /= 255.0  # Normalization
+    img_tensor /= 255.0  # Normalization (adjust as needed)
     
     return img_tensor.unsqueeze(0)  # Add batch dimension
 
@@ -37,7 +70,7 @@ def perform_object_detection(image):
         st.error(f"Model file not found at path: {model_path}")
         return None  # Return early if the model file is not found
 
-    model = torch.load(model_path, map_location='cpu')['model'].float()  # Pemrosesan di CPU, model diubah ke float
+    model = torch.hub.load('ultralytics/yolov5:master', 'custom', path=model_path, force_reload=True)
     model.eval()
 
     # Load image for object detection
@@ -50,41 +83,28 @@ def perform_object_detection(image):
     # Kembalikan hasil deteksi
     return results
 
+# ... (fungsi lainnya tetap sama)
 
-# Fungsi halaman Scanner yang diperbarui
+
+
 def page_scanner():
-    st.title("Scanner")
-    
-    # Widget untuk mengunggah gambar
-    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    st.title("YOLOv5 Object Detection with Streamlit")
 
-    if uploaded_image is not None:
-        # Menggunakan PIL untuk membaca gambar
-        image = Image.open(uploaded_image)
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-        # Menampilkan gambar
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
+        st.write("")
+        st.write("Classifying...")
 
-        # Lakukan deteksi objek menggunakan YOLOv5
-        results = perform_object_detection(image)
+        # Perform prediction
+        pred_image = predict_image(uploaded_file)
 
-        # Check if the results are available
-        if results is not None and len(results) > 0:
-            # Ambil hasil deteksi untuk objek pertama dalam batch
-            detected_class = results[0, 0]  # Ganti indeks sesuai dengan kebutuhan Anda
+        # Display the predicted image
+        st.image(pred_image, caption="Predicted Image.", use_column_width=True)
 
-            # Akses nama dan confidence
-            class_name = detected_class['name']
-            confidence = detected_class['confidence']
-
-            # Tampilkan informasi
-            st.write(f"Detected: {class_name} with confidence {confidence:.2f}")
-
-            # Pemrosesan gambar (contoh: konversi ke array NumPy)
-            image_array = np.array(image)
-            st.write("Image Shape:", image_array.shape)
-        
-    st.write("Berikut adalah hasil dari skrinning sel kanker rahim")
+if __name__ == "__page_scanner__":
+    page_scanner()
 
 
 
