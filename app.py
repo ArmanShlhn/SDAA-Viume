@@ -1,15 +1,4 @@
-# Import library YOLOv5 yang diperlukan
 import streamlit as st
-custom_css = """
-    <style>
-        body {
-            background: linear-gradient(-15deg, rgba(255, 255, 255, 0.315), rgba(47, 23, 136, 0.336),rgba(0, 255, 255, 0.411), rgba(47, 23, 136, 0.336), rgba(255, 255, 255, 0.315));
-        }
-    </style>
-"""
-
-st.markdown(custom_css, unsafe_allow_html=True)
-
 from PIL import Image
 import numpy as np
 
@@ -17,7 +6,7 @@ import torch
 import os  # Import the os module for path manipulation
 from torchvision import transforms
 
-import streamlit as st
+
 from PIL import Image, ImageDraw
 import torch
 import io
