@@ -1,54 +1,52 @@
 import streamlit as st
-import pandas as pd
-from io import StringIO
-from PIL import Image
-import numpy as np
+from PIL import Image, ImageDraw
+import torch
+import io
+import json
+
+# Load YOLOv5 model
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='D:/Fathur Files/Semester 7/SDAA/model/best.pt')
+
+def predict_image(file):
+    image_bytes = file.read()
+    img = Image.open(io.BytesIO(image_bytes))
+
+    # Perform prediction
+    pred_img = model(img)
+
+    # Render predicted image with bounding boxes
+    img_with_boxes = img.copy()
+    draw = ImageDraw.Draw(img_with_boxes)
+
+    for det in pred_img.xyxy[0]:
+        # Format of det: [x_min, y_min, x_max, y_max, confidence, class]
+        x_min, y_min, x_max, y_max, _, class_id = map(int, det)
+
+        # Draw bounding box
+        draw.rectangle([x_min, y_min, x_max, y_max], outline="red", width=2)
+
+        # Optionally, you can display class labels
+        label = f"Class: {class_id}"
+        draw.text((x_min, y_min - 10), label, fill="red")
+
+    return img_with_boxes
 
 
-# Fungsi untuk membuat halaman
-def page_home():
-    st.title("WELCOME TO VIUME")
-    st.write("DIGITAL PATHOLOGY PLATFORM FOR CERVICAL CANCER DETECTION")
-    st.write("Aplikasi yang dirancang untuk memanfaatkan teknologi patologi digital guna meningkatkan deteksi dan diagnosis kanker serviks")
+def main():
+    st.title("YOLOv5 Object Detection with Streamlit")
 
-def page_scanner():
-    st.title("Scanner")
-        # Widget untuk mengunggah gambar
-    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-    if uploaded_image is not None:
-        # Menggunakan PIL untuk membaca gambar
-        image = Image.open(uploaded_image)
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
+        st.write("")
+        st.write("Classifying...")
 
-        # Menampilkan gambar
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        # Perform prediction
+        pred_image = predict_image(uploaded_file)
 
-        # Pemrosesan gambar (contoh: konversi ke array NumPy)
-        image_array = np.array(image)
-        st.write("Image Shape:", image_array.shape)
-    st.write("Berikut adalah hasil dari skrinning sel kanker rahim")
+        # Display the predicted image
+        st.image(pred_image, caption="Predicted Image.", use_column_width=True)
 
-def page_about():
-    st.title("About")
-    st.write("Ini adalah halaman tentang kami")
-
-def page_contact():
-    st.title("Contact")
-    st.write("Hubungi kami di sini")
-
-# Dictionary untuk menyimpan halaman
-pages = {
-    "Home": page_home,
-    "Scanner": page_scanner,
-    "About": page_about,
-    "Contact": page_contact,
-    
-}
-
-# Layout navbar
-logo_path = "img\logoviume-removebg-preview.png"
-st.sidebar.image(logo_path, width=150)
-selected_page = st.sidebar.radio("Menu", list(pages.keys()))
-
-# Memanggil fungsi halaman yang dipilih
-pages[selected_page]()
+if __name__ == "__main__":
+    main()
