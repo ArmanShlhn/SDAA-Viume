@@ -1,7 +1,5 @@
 import streamlit as st
-from PIL import Image
 import numpy as np
-import torch
 import os  # Import the os module for path manipulation
 from torchvision import transforms
 from PIL import Image, ImageDraw
@@ -30,7 +28,7 @@ def predict_image(file):
         1: "ASCH-US",
         2: "HSIL",
         3: "LSIL",
-        4: "Negative",
+        4: "Normal",
         5: "SCC",
     # Tambahkan mapping lain sesuai kebutuhan
     }
