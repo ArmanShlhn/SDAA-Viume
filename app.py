@@ -68,15 +68,28 @@ def predict_image(file):
 
 
 def page_scanner():
-    st.title("YOLOv5 Object Detection with Streamlit")
+    st.title("Scanner")
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Choose an image here.", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
+        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
         st.write("")
-        st.write("Cervical cancer cell screening results by VIUME")
+        st.write("Classifying...")
+        st.write("")
+        # CSS rata tengah teks
+        st.markdown("""
+            <style>
+                .centered-text {
+                    text-align: center;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
+        # Menambahkan kelas CSS ke elemen Markdown untuk mengatur rata tengah
+        st.markdown("""
+        <h3 class="centered-text">Cervical cancer cell screening results by VIUME</h3>
+        """, unsafe_allow_html=True)
         # Perform prediction
         pred_image = predict_image(uploaded_file)
 
@@ -88,32 +101,45 @@ if __name__ == "__page_scanner__":
 
 
 
-# Fungsi untuk membuat halaman
+# home
 def page_home():
-    st.title("WELCOME TO VIUME")
-    st.write("DIGITAL PATHOLOGY PLATFORM FOR CERVICAL CANCER DETECTION")
-    st.write("Aplikasi yang dirancang untuk memanfaatkan teknologi patologi digital guna meningkatkan deteksi dan diagnosis kanker serviks")
+    st.subheader("WELCOME TO VIUME")
+    st.title("DIGITAL PATHOLOGY PLATFORM FOR CERVICAL CANCER DETECTION")
+    st.write("This website is designed to utilize digital pathology technology to increase the accuracy of cervical cancer detection and diagnosis by utilizing Artificial Intelligence. This website is also the latest innovation for a better Indonesia in terms of health and technology because it can help pathologists speed up and increase precision/accuracy in detecting cervical cancer cells.")
+    st.write("")
 
-def page_about():
-    st.title("About")
-    st.write("Ini adalah halaman tentang kami")
 
+#contact us
 def page_contact():
-    st.title("Contact")
-    st.write("Hubungi kami di sini")
+    st.title("Contact Us")
 
-# Dictionary untuk menyimpan halaman
+    # Informasi Kontak
+    st.header("More information about us!")
+
+    # Instagram
+    st.image("img\instagramicon.png", width=30)
+    st.write("[@viume_official](https://www.instagram.com/viume_official/)")
+
+    # Nomor Telepon
+    st.image("img\whatsapp_socialnetwork_17360.png", width=30)
+    st.write("(+62)888-2222-4444")
+
+    #gmail
+    st.image("img/icongmail.png", width=30)
+    st.write("[info.viume@.com](mailto:info.viume@gmail.com)")
+
+
+# halaman
 pages = {
     "Home": page_home,
     "Scanner": page_scanner,
-    "About": page_about,
-    "Contact": page_contact,
+    "Contact US": page_contact,
 }
 
-# Layout navbar
+# navbar
 logo_path = "img\logoviume-removebg-preview.png"
 st.sidebar.image(logo_path, width=250)
 selected_page = st.sidebar.selectbox("", list(pages.keys()))
 
-# Memanggil fungsi halaman yang dipilih
+# memanggil fungsi halaman
 pages[selected_page]()
