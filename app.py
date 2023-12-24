@@ -24,17 +24,33 @@ def predict_image(file):
     img_with_boxes = img.copy()
     draw = ImageDraw.Draw(img_with_boxes)
 
+    # Dictionary untuk memetakan ID kelas ke nama kelas
+    class_mapping = {
+        0: "ASC-H",
+        1: "ASCH-US",
+        2: "HSIL",
+        3: "LSIL",
+        4: "Negative",
+        5: "SCC",
+    # Tambahkan mapping lain sesuai kebutuhan
+    }
+
+# Melakukan iterasi pada objek pred_img.xyxy[0]
     for det in pred_img.xyxy[0]:
-        # Format of det: [x_min, y_min, x_max, y_max, confidence, class]
+        # Format det: [x_min, y_min, x_max, y_max, confidence, class]
         x_min, y_min, x_max, y_max, _, class_id = map(int, det)
 
         # Draw bounding box
         draw.rectangle([x_min, y_min, x_max, y_max], outline="red", width=2)
 
-        # Optionally, you can display class labels
-        label = f"Class: {class_id}"
+        # Mendapatkan nama kelas berdasarkan ID kelas
+        class_name = class_mapping.get(class_id, f"Unknown Class {class_id}")
+
+        # Display class labels
+        label = f"Class: {class_name}"
         draw.text((x_min, y_min - 10), label, fill="red")
 
+        
     return img_with_boxes
 
 
